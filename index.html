@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>测测你的本命灵宠</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background-color: #F6F3F0;
+      color: #5C544E;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 4px 20px rgba(124, 114, 107, 0.08);
+    }
+
+    /* ===== 封面页 ===== */
+    #page-cover .card { text-align: center; padding-top: 48px; padding-bottom: 48px; }
+    .cover-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .cover-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #4A423C;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .cover-desc {
+      font-size: 14px;
+      color: #8A8078;
+      line-height: 2;
+      margin-bottom: 28px;
+    }
+    .cover-meta {
+      font-size: 12px;
+      color: #B5ACA4;
+      margin-bottom: 32px;
+    }
+    .btn {
+      display: inline-block;
+      background: #A99F97;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 48px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn:hover { background: #8A8078; }
+    .btn:disabled {
+      background: #D5CEC7;
+      cursor: not-allowed;
+    }
+
+    /* ===== 答题页 ===== */
+    #quiz-wrap { display: none; }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #8A8078;
+    }
+    .progress-bar {
+      flex: 1;
+      max-width: 120px;
+      height: 6px;
+      background: #EDE8E3;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-left: 16px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #A99F97;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    .question-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #4A423C;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .option-item {
+      padding: 14px 16px;
+      border: 1.5px solid #E5DDD6;
+      border-radius: 14px;
+      font-size: 15px;
+      color: #6B625A;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+    }
+    .option-item:hover { background: #F6F3F0; }
+    .option-item.selected {
+      background: #A99F97;
+      color: #fff;
+      border-color: #A99F97;
+    }
+    .quiz-footer {
+      text-align: center;
+    }
+
+    /* ===== 结果页 ===== */
+    #page-result { display: none; }
+    #page-result .card { text-align: center; }
+    .result-label {
+      font-size: 14px;
+      color: #8A8078;
+      margin-bottom: 12px;
+    }
+    .result-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 20px;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      display: block;
+    }
+    .result-name {
+      font-size: 26px;
+      font-weight: 700;
+      color: #8A8078;
+      margin-bottom: 20px;
+    }
+    .result-desc {
+      font-size: 14px;
+      color: #6B625A;
+      line-height: 1.9;
+      text-align: left;
+      margin-bottom: 32px;
+      padding: 0 8px;
+    }
+    .result-emoji-fallback {
+      font-size: 80px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== 封面页 ===== -->
+    <div id="page-cover">
+      <div class="card">
+        <div class="cover-icon">🐾</div>
+        <h1 class="cover-title">测测你的本命灵宠</h1>
+        <p class="cover-desc">
+          ✧ 趣味性格小测试 ✧<br>
+          没有玄学，只看你的本能选择<br>
+          看看藏在你性格里的小动物是谁吧
+        </p>
+        <p class="cover-meta">一共10题｜每题凭第一感觉选择</p>
+        <button class="btn" onclick="startTest()">开始测试</button>
+      </div>
+    </div>
+
+    <!-- ===== 答题页 ===== -->
+    <div id="quiz-wrap">
+      <div class="card">
+        <div class="quiz-header">
+          <span>题目 <span id="current-num">1</span> / 10</span>
+          <div class="progress-bar">
+            <div id="progress-bar" class="progress-fill" style="width: 10%;"></div>
+          </div>
+        </div>
+        <h2 id="question-title" class="question-title"></h2>
+        <div id="option-box" class="option-list"></div>
+        <div class="quiz-footer">
+          <button id="next-btn" class="btn" onclick="nextQuestion()" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 结果页 ===== -->
+    <div id="page-result">
+      <div class="card">
+        <p class="result-label">你的本命灵宠是</p>
+        <img id="pet-img" class="result-img" src="" alt="本命灵宠" style="display:none;">
+        <div id="pet-emoji" class="result-emoji-fallback" style="display:none;">🐱</div>
+        <h2 id="pet-name" class="result-name"></h2>
+        <p id="pet-desc" class="result-desc"></p>
+        <button class="btn" onclick="restartTest()">重新测试</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ===== 图片资源 =====
+    const petImages = {
+      cat: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZnQ2bDAxNoWccCx1k5GchoTWnTg",
+      dog: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/KGRlbA1YJoD4MjxTuQfc3FcYn5g",
+      rabbit: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/VmYAbF5TcoIMlixjko9cftj1nSf",
+      fox: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CZVdbgJfcop4ILxRtqyco8sSn5E",
+      hamster: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Z88Wbk4K3ogYIVx0YBxcdOF1npe",
+      owl: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OWEabnFFpoggd5xNvGgcZqMknAf",
+      dolphin: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/KsABbhCB9oRHM8xSdoOcYSdhnDh",
+      deer: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/NPHjbTrMLoapYPxZGeOcmx8kncf",
+      squirrel: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/MnwibDtQvoxRvXx852GcnV7Ln3g",
+      penguin: "https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Ek9TbhEFloMLZdxBh0Jc81DNnJg"
+    };
+    const petEmojiFallback = {
+      otter: "🦦",
+      sheep: "🐑"
+    };
+
+    // ===== 题目 =====
+    const questions = [
+      {
+        q: "周末空闲时，你更想怎么度过？",
+        opts: [
+          { text: "约朋友出门，热闹才开心", tag: "dog" },
+          { text: "自己宅家安静发呆，不被打扰", tag: "cat" },
+          { text: "和少数熟悉好友小聚，人多会疲惫", tag: "deer" },
+          { text: "看心情随机决定，不提前计划", tag: "fox" }
+        ]
+      },
+      {
+        q: "心情不好的时候，你通常会？",
+        opts: [
+          { text: "找人倾诉，需要陪伴安慰", tag: "dog" },
+          { text: "悄悄躲起来，独自慢慢消化", tag: "owl" },
+          { text: "找点好玩的事，快速转移注意力", tag: "otter" },
+          { text: "变得敏感烦躁，不希望被打扰", tag: "rabbit" }
+        ]
+      },
+      {
+        q: "接触新鲜事物时，你的习惯是？",
+        opts: [
+          { text: "好奇拉满，想到就尝试", tag: "squirrel" },
+          { text: "先远远观察，确认安全再靠近", tag: "owl" },
+          { text: "慢慢来，舒服最重要，不急", tag: "sheep" },
+          { text: "规划好步骤，稳妥再行动", tag: "penguin" }
+        ]
+      },
+      {
+        q: "和喜欢的人相处，你偏向？",
+        opts: [
+          { text: "喜欢贴贴，主动找对方黏在一起", tag: "rabbit" },
+          { text: "心里在意，但需要属于自己的空间", tag: "cat" },
+          { text: "偶尔撒娇，大部分时候各自自在", tag: "fox" },
+          { text: "默默记住对方需求，安静陪伴", tag: "deer" }
+        ]
+      },
+      {
+        q: "来到完全陌生的新环境，你会？",
+        opts: [
+          { text: "到处探索，对一切充满好奇", tag: "squirrel" },
+          { text: "有点紧张，先找安全角落待着", tag: "hamster" },
+          { text: "状态平稳，该干嘛干嘛", tag: "dolphin" },
+          { text: "紧跟熟悉的人，不敢单独乱跑", tag: "sheep" }
+        ]
+      },
+      {
+        q: "下面哪种状态会让你觉得最治愈？",
+        opts: [
+          { text: "晒着暖乎乎的太阳懒懒发呆", tag: "cat" },
+          { text: "自由奔跑，无拘无束地玩耍", tag: "deer" },
+          { text: "窝在小小的角落，安全感满满", tag: "hamster" },
+          { text: "和伙伴一起互动打闹，轻松快乐", tag: "otter" }
+        ]
+      },
+      {
+        q: "专心做事的时候突然被打扰，你会？",
+        opts: [
+          { text: "有点烦，但不会发火，悄悄躲开", tag: "rabbit" },
+          { text: "直接礼貌告诉对方，不要吵我", tag: "fox" },
+          { text: "受惊一跳，快速缩回自己节奏", tag: "hamster" },
+          { text: "不介意，可以一起玩一会儿", tag: "dog" }
+        ]
+      },
+      {
+        q: "你内心最向往的生活是？",
+        opts: [
+          { text: "自由自在，不受束缚，想去哪去哪", tag: "dolphin" },
+          { text: "安稳简单，有小窝和固定的陪伴", tag: "sheep" },
+          { text: "每天都有新鲜趣事，不会无聊", tag: "squirrel" },
+          { text: "压力少一点，懒懒悠闲度日", tag: "otter" }
+        ]
+      },
+      {
+        q: "别人对你的评价，更常是？",
+        opts: [
+          { text: "温柔好相处，很会照顾别人情绪", tag: "sheep" },
+          { text: "独立有想法，不容易被拿捏", tag: "fox" },
+          { text: "温柔疏离，自带安静氛围感", tag: "deer" },
+          { text: "热情真诚，开心都写在脸上", tag: "dog" }
+        ]
+      },
+      {
+        q: "面对选择纠结时，你一般？",
+        opts: [
+          { text: "跟着直觉走，喜欢优先", tag: "dolphin" },
+          { text: "反复权衡，谨慎做决定", tag: "owl" },
+          { text: "随缘，怎么选都可以", tag: "cat" },
+          { text: "听信任的人的建议再决定", tag: "penguin" }
+        ]
+      }
+    ];
+
+    // ===== 结果文案 =====
+    const petInfo = {
+      cat: {
+        name: "小猫",
+        desc: "你是外表松弛、内心有边界的小猫。不是高冷，只是很懂自爱。喜欢舒服的节奏，讨厌被强行捆绑，愿意主动靠近的人，都是你认真挑选过的。你温柔但不依附，独处时会给自己充电，懂享受安静的浪漫。别人觉得你随性，其实你心里清楚自己想要什么。"
+      },
+      dog: {
+        name: "小狗",
+        desc: "你的本命灵宠是热情真诚的小狗！心思简单直接，喜欢就主动靠近，难过也很快被治愈。你很看重信任和陪伴，愿意真心对待身边的人。偶尔有点莽撞，但这份纯粹非常难得。你自带感染力，靠近你的人都会觉得温暖安心。"
+      },
+      rabbit: {
+        name: "小兔子",
+        desc: "软乎乎又敏感的小兔子就是你。内心细腻共情力很强，很容易感知别人的情绪。外表看起来软软很好说话，其实胆子小小的，受到惊吓会缩回自己的小世界。你很珍惜偏爱，一旦认定一个人，就会很黏人很真诚。"
+      },
+      fox: {
+        name: "小狐狸",
+        desc: "聪明灵动的小狐狸是你的本命灵宠。你观察力很强，心思通透，看得懂很多人情世故，但不喜欢刻意周旋。你有自己的小小心机和趣味，可坏可不乖，讨厌被控制。看似游刃有余，其实只会对极少数人放下防备。"
+      },
+      hamster: {
+        name: "仓鼠",
+        desc: "小小的仓鼠藏着你的灵魂。你很需要专属的安全小空间，对外界容易紧张，习惯慢慢试探。喜欢囤积让自己安心的东西，偏爱简单安稳的小快乐。不喜欢复杂社交，比起热闹，一个人安安稳稳的小日子最适合你。"
+      },
+      owl: {
+        name: "猫头鹰",
+        desc: "冷静清醒的猫头鹰。你习惯先观察再行动，不容易冲动上头，看待事情有自己独特视角。比起倾诉，你更擅长自我消化情绪。看起来安静寡言，其实想法丰富深刻。你偏爱高质量的交流，无效社交会让你觉得疲惫。"
+      },
+      dolphin: {
+        name: "海豚",
+        desc: "自由通透的海豚。你讨厌压抑和束缚，直觉很准，适应力很强。情绪来得快，也放得下，不喜欢钻牛角尖。你向往开阔的世界，喜欢轻松自在的关系，不会强求谁留在身边。自带治愈气场，很擅长带动氛围。"
+      },
+      deer: {
+        name: "小鹿",
+        desc: "温柔疏离的小鹿。气质安静干净，共情力很好，但自带一层淡淡的距离感。你很善良，却不会轻易敞开心扉。喜欢自然舒服的相处节奏，害怕太浓烈、有压迫感的关系。懂欣赏美好，内心保留一份柔软浪漫。"
+      },
+      squirrel: {
+        name: "松鼠",
+        desc: "活力满满的小松鼠！好奇心爆棚，很难长期忍受枯燥无聊的生活。脑子转得快，兴趣很多，喜欢新鲜事物。偶尔三分钟热度，但永远对世界抱有热情。你乐于探索，生活里的小惊喜就可以让你开心很久。"
+      },
+      penguin: {
+        name: "企鹅",
+        desc: "稳重慢热的小企鹅。你做事踏实靠谱，不喜欢冒失冒险，认定的人和事会长久坚持。外表憨憨很好相处，有自己固定的节奏。不擅长激烈表达情绪，但承诺和陪伴都很实在，是朋友里很可靠的存在。"
+      },
+      otter: {
+        name: "海獭",
+        desc: "快乐摆烂选手海獭！你的天赋是在平凡日子里找到乐趣，心态松弛，不爱给自己太大压力。喜欢轻松的互动，讨厌紧绷的氛围。烦恼来得快去得快，很会哄自己开心。和你相处，会觉得轻松没有负担。"
+      },
+      sheep: {
+        name: "小羊",
+        desc: "软萌温顺的小羊。性格温和包容，很体谅别人，不喜欢冲突争吵。你向往安稳温暖的集体和陪伴，很容易被温柔打动。底线看着低，但一旦被反复消耗，也会悄悄离开。你值得被好好呵护、温柔对待。"
+      }
+    };
+
+    // ===== 状态 =====
+    let current = 0;
+    let scoreMap = {};
+    let selectedTag = null;
+
+    function startTest() {
+      document.getElementById("page-cover").style.display = "none";
+      document.getElementById("quiz-wrap").style.display = "block";
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      document.getElementById("current-num").innerText = current + 1;
+      document.getElementById("progress-bar").style.width = ((current + 1) / questions.length * 100) + "%";
+      document.getElementById("question-title").innerText = q.q;
+
+      const box = document.getElementById("option-box");
+      box.innerHTML = "";
+      selectedTag = null;
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.disabled = true;
+
+      q.opts.forEach((opt, idx) => {
+        const div = document.createElement("div");
+        div.className = "option-item";
+        div.innerText = opt.text;
+        div.onclick = function () {
+          box.querySelectorAll(".option-item").forEach(d => d.classList.remove("selected"));
+          div.classList.add("selected");
+          selectedTag = opt.tag;
+          nextBtn.disabled = false;
+        };
+        box.appendChild(div);
+      });
+    }
+
+    function nextQuestion() {
+      if (!selectedTag) return;
+      scoreMap[selectedTag] = (scoreMap[selectedTag] || 0) + 1;
+      current++;
+      if (current >= questions.length) {
+        showResult();
+        return;
+      }
+      renderQuestion();
+    }
+
+    function showResult() {
+      document.getElementById("quiz-wrap").style.display = "none";
+      document.getElementById("page-result").style.display = "block";
+
+      let maxCount = 0;
+      let finalPet = "cat";
+      for (let key in scoreMap) {
+        if (scoreMap[key] > maxCount) {
+          maxCount = scoreMap[key];
+          finalPet = key;
+        }
+      }
+
+      const pet = petInfo[finalPet];
+      document.getElementById("pet-name").innerText = pet.name;
+      document.getElementById("pet-desc").innerText = pet.desc;
+
+      // 图片或 emoji fallback
+      const imgEl = document.getElementById("pet-img");
+      const emojiEl = document.getElementById("pet-emoji");
+      if (petImages[finalPet]) {
+        imgEl.src = petImages[finalPet];
+        imgEl.style.display = "block";
+        emojiEl.style.display = "none";
+      } else {
+        imgEl.style.display = "none";
+        emojiEl.style.display = "block";
+        emojiEl.innerText = petEmojiFallback[finalPet] || "🐾";
+      }
+    }
+
+    function restartTest() {
+      current = 0;
+      scoreMap = {};
+      selectedTag = null;
+      document.getElementById("page-result").style.display = "none";
+      document.getElementById("page-cover").style.display = "block";
+    }
+  </script>
+</body>
+</html>
